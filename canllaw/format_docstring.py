@@ -1,4 +1,5 @@
 import re
+import ast
 
 known_headers = (
     'parameters',
@@ -23,10 +24,25 @@ def strip_non_alpha_num(raw):
     pattern = re.compile(r"[\W_]+")
     return pattern.sub("", raw)
 
-def create_md_content(doc_string):
+def create_md_content(node, title=None):
+
+    if title != node.name:
+        print(node.name, isinstance(node, ast.FunctionDef), ', '.join([a.arg for a in node.args.args if a.arg != 'self']))
+
+    doc_string = ast.get_docstring(node)
+
+    cache = str(title)
+    if isinstance(node, ast.FunctionDef): 
+        cache += ' ('
+        cache += ', '.join([a.arg for a in node.args.args if a.arg != 'self'])
+        cache += ')'
+
+    cache = '## _' + cache + '_'
+
+    if doc_string is None:
+        return cache + '\n'
 
     last_indent = -1
-    cache = '## CLASS NAME'
     for line in doc_string.splitlines():
 
         indent = measure_indent(line)
@@ -46,8 +62,10 @@ def create_md_content(doc_string):
                 # this is an inner_header
                 parts = line.split(':')
                 for index, part in enumerate(parts):
-                    if index == 0:
+                    if index == 0 and len(part.split()) > 0:
                         cache += '\n- **' + part + '**  '
+                    elif len(part.split()) == 0:
+                        pass
                     else:
                         cache += ' - ' + part + '  '
             else:
@@ -56,9 +74,5 @@ def create_md_content(doc_string):
 
         last_indent = indent
 
-    return cache
-
-doc = open('doc.txt', mode='r').read()
-md = create_md_content(doc)
-
-open('doc.md', mode='w').write(md)
+    #print(cache)
+    return cache + '\n'
