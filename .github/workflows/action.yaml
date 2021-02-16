@@ -1,0 +1,12 @@
+name: my_action
+on: [push, pull_request]
+
+jobs:
+  my_action:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 #get fuller history
+      - name: test_action
+        uses: joocer/action-test@v0.0.1
