@@ -9,4 +9,4 @@ jobs:
         with:
           fetch-depth: 0 #get fuller history
       - name: test_action
-        uses: joocer/action-test@v0.0.8
+        uses: joocer/action-test@v0.0.9
